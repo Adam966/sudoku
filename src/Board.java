@@ -1,8 +1,6 @@
-import java.util.ArrayList;
-
 public class Board {
     private String input;
-    private int[][] array = new int[9][9];
+    private Element[][] array = new Element[9][9];
 
 
     public Board(String string) {
@@ -12,16 +10,7 @@ public class Board {
     public void setArray() {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                array[i][j] = Character.getNumericValue(input.charAt(i*9 + j));
-            }
-        }
-    }
-
-    public void solve() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (checkElement(array[i][j]))
-                    array[i][j] = tryElement(j,i);
+                     array[i][j] = (new Element(Character.getNumericValue(input.charAt(i*9 + j))));
             }
         }
     }
@@ -29,32 +18,44 @@ public class Board {
     public void showArray() {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                System.out.print(array[i][j] + " ");
+                System.out.print(array[i][j].getNumber() + " ");
             }
             System.out.println(" ");
         }
     }
 
+    public void solve() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (checkElement(array[i][j])) {
+                    array[i][j].setNumber(tryElement(j,i));
+                    //System.out.println("x: " + j + "y: " + i + " ");
+                }
+            }
+        }
+    }
+
     //******************************* ELEMENT FUNCTIONS *************************************************************//
-    public boolean checkElement(int element) {
-        if (element == 0)
+    public boolean checkElement(Element element) {
+        if (element.isStatus())
             return true;
         else
             return false;
     }
 
     public int tryElement(int x, int y) {
-        ArrayList<Integer> expected = new ArrayList<>();
-
         for (int i = 1; i < 10; i++) {
-            if (checkSquare(x,y,array[y][x]) && checkRow(x,y,array[y][x]) && checkColumn(x,y,array[y][x]))
-                expected.add(i);
+            if (checkSquare(x,y,i) && checkRow(y,i) && checkColumn(x,i))
+                array[y][x].getExpected().add(i);
         }
+        System.out.println(array[y][x].getExpected().toString());
 
-        if (expected.size() == 1)
-            return expected.get(0);
-        else
+        if (array[y][x].getExpected().size() == 1)
+            return array[y][x].getExpected().get(0);
+        else {
+            array[y][x].removeExpected();
             return 0;
+        }
     }
 
     //******************************** CHECK FUNCTIONS **************************************************************//
@@ -62,8 +63,10 @@ public class Board {
         for(int i=getCornerY(y); i<getCornerY(y) + 3; i++) {
             for(int j=getCornerX(x); j<getCornerX(x) + 3; j++) {
                 //System.out.print(array[i][j] + " ");
-                if (array[j][i] != num)
+                if (array[i][j].getNumber() != num)
                     return true;
+                else
+                    return false;
             }
             //System.out.println(" ");
         }
@@ -78,20 +81,24 @@ public class Board {
         return (y/3) * 3;
     }
 
-    public boolean checkRow(int x, int y, int num) {
+    public boolean checkRow( int y, int num) {
         for (int i = 0; i < 9; i++) {
             //System.out.print(array[y][i] + " ");
-            if (array[y][i] != num)
+            if (array[y][i].getNumber() != num)
                 return true;
+            else
+                return false;
         }
         return false;
     }
 
-    public boolean checkColumn(int x, int y, int num) {
+    public boolean checkColumn(int x, int num) {
         for (int i = 0; i < 9; i++) {
             //System.out.print(array[i][x] + " ");
-            if (array[i][x] != num)
+            if (array[i][x].getNumber() != num)
                 return true;
+            else
+                return false;
         }
         return false;
     }
