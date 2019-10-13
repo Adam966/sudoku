@@ -2,7 +2,6 @@ public class Board {
     private String input;
     private Element[][] array = new Element[9][9];
 
-
     public Board(String string) {
         this.input = string;
     }
@@ -10,7 +9,10 @@ public class Board {
     public void setArray() {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                     array[i][j] = (new Element(Character.getNumericValue(input.charAt(i*9 + j))));
+                if (input.charAt(i*9 + j) == '0')
+                     array[i][j] = (new Element(Character.getNumericValue(input.charAt(i*9 + j)), false));
+                else
+                    array[i][j] = (new Element(Character.getNumericValue(input.charAt(i*9 + j)), true));
             }
         }
     }
@@ -24,12 +26,30 @@ public class Board {
         }
     }
 
-    public void solve() {
+    public boolean checkBoard() {
+        int count = 0;
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (checkElement(array[i][j])) {
-                    array[i][j].setNumber(tryElement(j,i));
-                    //System.out.println("x: " + j + "y: " + i + " ");
+                if (array[i][j].isStatus())
+                    count++;
+            }
+        }
+
+        if (count < 80)
+            return true;
+        else
+            return false;
+    }
+
+    public void solve() {
+        while(checkBoard()) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    //System.out.println(array[i][j].isStatus());
+                    if (checkElement(array[i][j])) {
+                        array[i][j].setNumber(tryElement(j,i));
+                        //System.out.println("x: " + j + "y: " + i + " ");
+                    }
                 }
             }
         }
@@ -38,39 +58,45 @@ public class Board {
     //******************************* ELEMENT FUNCTIONS *************************************************************//
     public boolean checkElement(Element element) {
         if (element.isStatus())
-            return true;
-        else
             return false;
+        else
+            return true;
     }
 
     public int tryElement(int x, int y) {
+        array[y][x].removeExpected();
         for (int i = 1; i < 10; i++) {
-            if (checkSquare(x,y,i) && checkRow(y,i) && checkColumn(x,i))
+            if (checkSquare(x,y,i) && checkRow(y,i) && checkColumn(x,i)) {
                 array[y][x].getExpected().add(i);
+            }
         }
-        System.out.println(array[y][x].getExpected().toString());
+        //System.out.println(array[y][x].getExpected().toString());
 
-        if (array[y][x].getExpected().size() == 1)
+        if (array[y][x].getExpected().size() == 1) {
+            array[y][x].setStatus(true);
             return array[y][x].getExpected().get(0);
+        }
         else {
-            array[y][x].removeExpected();
             return 0;
         }
     }
 
     //******************************** CHECK FUNCTIONS **************************************************************//
     public boolean checkSquare(int x, int y, int num) {
+        int count = 0;
         for(int i=getCornerY(y); i<getCornerY(y) + 3; i++) {
             for(int j=getCornerX(x); j<getCornerX(x) + 3; j++) {
                 //System.out.print(array[i][j] + " ");
-                if (array[i][j].getNumber() != num)
-                    return true;
-                else
-                    return false;
+                if (!(array[i][j].getNumber() != num))
+                    count++;
             }
             //System.out.println(" ");
         }
-        return false;
+
+        if (count == 0)
+            return true;
+        else
+            return false;
     }
 
     public int getCornerX(int x) {
@@ -81,25 +107,29 @@ public class Board {
         return (y/3) * 3;
     }
 
-    public boolean checkRow( int y, int num) {
+    public boolean checkRow(int y, int num) {
+        int count = 0;
         for (int i = 0; i < 9; i++) {
             //System.out.print(array[y][i] + " ");
-            if (array[y][i].getNumber() != num)
-                return true;
-            else
-                return false;
+            if (!(array[y][i].getNumber() != num))
+                count++;
         }
-        return false;
+        if (count == 0)
+            return true;
+        else
+            return false;
     }
 
     public boolean checkColumn(int x, int num) {
+        int count = 0;
         for (int i = 0; i < 9; i++) {
             //System.out.print(array[i][x] + " ");
-            if (array[i][x].getNumber() != num)
-                return true;
-            else
-                return false;
+            if (!(array[i][x].getNumber() != num))
+                count++;
         }
-        return false;
+        if (count == 0)
+            return true;
+        else
+            return false;
     }
 }

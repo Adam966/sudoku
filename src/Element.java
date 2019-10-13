@@ -5,10 +5,9 @@ public class Element {
     private  boolean status;
     private ArrayList<Integer> expected = new ArrayList<>();
 
-    public Element(int number) {
+    public Element(int number, boolean status) {
         this.number = number;
-        if (this.number == 0)
-            this.status = false;
+        this.status = status;
     }
 
     public int getNumber() {
