@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Element {
     private int number;
-    private  boolean status;
+    private boolean status;
     private ArrayList<Integer> expected = new ArrayList<>();
 
     public Element(int number, boolean status) {
